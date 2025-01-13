@@ -1,9 +1,6 @@
+#include "blockchain.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "blockchain.h"
-
-
-// TESTE DE COMMIT 
 
 int main() {
     Blockchain* blockchain = (Blockchain*)malloc(sizeof(Blockchain));
