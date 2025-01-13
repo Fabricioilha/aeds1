@@ -1,18 +1,22 @@
+#include "blockchain.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include "structures.h"
-#include "blockchain.h"
-#include "transactions.h"
-#include "utils.h"
 
 int main() {
-    //criação de um bloco
-    Block* genesisBlock = createBlock(0, "2025-01-09 10:00:00", "0", "abc123", 0, "def456");
+    Blockchain* blockchain = (Blockchain*)malloc(sizeof(Blockchain));
+    blockchain->head = createBlock(0, "0");
 
-    printBlock(genesisBlock);
+    addTransaction(blockchain->head, "Transaction 1");
+    addTransaction(blockchain->head, "Transaction 2");
 
-    free(genesisBlock);
+    calculateMerkleRoot(blockchain->head);
+    proofOfWork(blockchain->head);
 
+    Block* newBlock = createBlock(1, blockchain->head->hash);
+    blockchain->head->next = newBlock;
+
+    displayBlockchain(blockchain);
+
+    free(blockchain);
     return 0;
 }
