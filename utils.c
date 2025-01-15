@@ -13,9 +13,16 @@ void hashString(const char* str, char* output) {
 
 MerkleNode* createMerkleTree(Transaction transactions[], int count) {
     if (count == 0) return NULL;
+    
     if (count == 1) {
         MerkleNode* leaf = (MerkleNode*)malloc(sizeof(MerkleNode));
-        hashString(transactions[0].data, leaf->hash);
+        char combined[256];
+        snprintf(combined, sizeof(combined), "%s|%s|%d", 
+                 transactions[0].sender, 
+                 transactions[0].receiver, 
+                 transactions[0].amount);
+        
+        hashString(combined, leaf->hash);
         leaf->left = leaf->right = NULL;
         return leaf;
     }
