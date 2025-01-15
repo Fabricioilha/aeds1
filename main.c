@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+/* Testendo linux */
+
 int main() {
     Blockchain* blockchain = (Blockchain*)malloc(sizeof(Blockchain));
     loadBlockchainFromFile(blockchain);
