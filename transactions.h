@@ -1,10 +1,11 @@
 #ifndef TRANSACTIONS_H
 #define TRANSACTIONS_H
 
-#define MAX_DATA_SIZE 256
-
 typedef struct Transaction {
-    char data[MAX_DATA_SIZE];
+    char sender[50];
+    char receiver[50];
+    int amount;
 } Transaction;
+
 
 #endif

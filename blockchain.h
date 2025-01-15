@@ -26,9 +26,14 @@ typedef struct Blockchain {
 } Blockchain;
 
 Block* createBlock(int index, const char* previousHash);
-void addTransaction(Block* block, const char* data);
+void addTransaction(Block* block, const char* sender, const char* receiver, int amount);
 void calculateMerkleRoot(Block* block);
 int proofOfWork(Block* block);
+void mineBlock(Block* block);
 void displayBlockchain(Blockchain* bc);
+void saveBlockchainToFile(Blockchain* blockchain);
+void loadBlockchainFromFile(Blockchain* blockchain);
+void programLoop(Blockchain* blockchain);
+
 
 #endif
