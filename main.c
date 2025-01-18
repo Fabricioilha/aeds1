@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 
-/* Testendo linux */
+// Finalmente consegui resolver o problema da biblioteca openssl
 
 int main() {
     Blockchain* blockchain = (Blockchain*)malloc(sizeof(Blockchain));
