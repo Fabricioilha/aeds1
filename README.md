@@ -1,7 +1,7 @@
 # AEDS 1
 Trabalho de AEDS 1 - Blockchain
 
-gcc -o blockchain main.c blockchain.c transactions.c utils.c -lcrypto
+gcc -o saida main.c -lcrypto
 
 Lista de tarefas:
 

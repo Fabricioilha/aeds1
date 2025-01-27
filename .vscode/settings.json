@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "blockchain.h": "c",
-        "transactions.h": "c",
-        "utils.h": "c",
-        "sha.h": "c"
-    }
-}
