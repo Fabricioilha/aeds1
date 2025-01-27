@@ -127,7 +127,9 @@ int main() {
 void printBlockchain(Blockchain blockchain) {
     for(int i = 0; i < blockchain.blockCount; i++) {
         Block block = blockchain.blocks[i];
-        printf("----------------------------------------------------------\n");
+        if(i == 0){
+            printf("----------------------------------------------------------\n");
+        }
         printf("Bloco %d:\n", block.index);
         printf("  Timestamp: %s\n", block.timestamp);
         printf("  Hash anterior: %s\n", block.previousHash);
