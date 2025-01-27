@@ -1,37 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <openssl/evp.h>
-
-#define MAX_TRANSACTIONS 100
-#define MAX_BLOCKS 100
-typedef struct {
-    int index;
-    char timestamp[64];
-    char previousHash[EVP_MAX_MD_SIZE*2+1];
-    char merkleRoot[EVP_MAX_MD_SIZE*2+1];
-    int nonce;
-    char hash[EVP_MAX_MD_SIZE*2+1];
-    char transactions[MAX_TRANSACTIONS][256];
-    int transactionCount;
-} Block;
-
-typedef struct {
-    Block blocks[MAX_BLOCKS];
-    int blockCount;
-} Blockchain;
-
-void printBlockchain(Blockchain blockchain);
-void computeSHA256(char* str, char outputBuffer[EVP_MAX_MD_SIZE*2+1]);
-void calculateMerkleRoot(char transactions[MAX_TRANSACTIONS][256], int count, char merkleRoot[EVP_MAX_MD_SIZE*2+1]);
-void createBlock(Block* block, char previousHash[EVP_MAX_MD_SIZE*2+1]);
-void addTransaction(Block* block, char* transaction);
-void proofOfWork(Block* block);
-void addBlock(Blockchain* blockchain, Block block);
-int verifyTransactionInBlock(Block* block, char* transaction);
-void simulateAttack(Blockchain* blockchain, char* newTransaction);
-void saveBlockchain(Blockchain blockchain, const char* filename);
-void loadBlockchain(Blockchain* blockchain, const char* filename);
+#include "funcoes.c"
+//#include "structures.h"
 
 Blockchain blockchain;
 
