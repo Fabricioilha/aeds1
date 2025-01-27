@@ -276,9 +276,6 @@ void simulateAttack(Blockchain* blockchain, char* newTransaction) {
 }
 
 
-
-
-
 // Salvar blockchain em arquivo
 void saveBlockchain(Blockchain blockchain, const char* filename) {
     FILE* file = fopen(filename, "w");
