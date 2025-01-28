@@ -13,10 +13,11 @@ int main() {
     provaDeTrabalho(&blocoGenesis);
     adicionarBloco(&blockchain, blocoGenesis);
 
-    int escolha;
+    int opcao;
     char transacao[256];
     char nomeArquivo[256];
     char transacaoParaVerificar[256];
+    char novaTransacao[256];
     int indiceBloco;
 
     while (1) {
@@ -26,13 +27,14 @@ int main() {
         printf("3. Exibir blockchain\n");
         printf("4. Salvar blockchain em arquivo\n");
         printf("5. Carregar blockchain de arquivo\n");
-        printf("6. Verificar se uma transação está em um bloco\n");
+        printf("6. Verificar transação em um bloco\n");
+        printf("7. Simular ataque à blockchain\n");
         printf("0. Sair\n");
         printf("Escolha uma opção: ");
-        scanf("%d", &escolha);
-        getchar(); // Consumir o caractere de nova linha deixado pelo scanf
+        scanf("%d", &opcao);
+        getchar(); // Consumir o newline deixado pelo scanf
 
-        switch (escolha) {
+        switch (opcao) {
             case 1: // Inserir nova transação
                 printf("Digite a transação: ");
                 fgets(transacao, sizeof(transacao), stdin);
@@ -53,50 +55,46 @@ int main() {
                 break;
 
             case 4: // Salvar blockchain em arquivo
-                printf("Digite o nome do arquivo: ");
+                printf("Digite o nome do arquivo para salvar: ");
                 fgets(nomeArquivo, sizeof(nomeArquivo), stdin);
                 nomeArquivo[strcspn(nomeArquivo, "\n")] = '\0'; // Remover o newline
                 salvarBlockchain(&blockchain, nomeArquivo);
                 break;
 
             case 5: // Carregar blockchain de arquivo
-                printf("Digite o nome do arquivo: ");
+                printf("Digite o nome do arquivo para carregar: ");
                 fgets(nomeArquivo, sizeof(nomeArquivo), stdin);
                 nomeArquivo[strcspn(nomeArquivo, "\n")] = '\0'; // Remover o newline
                 carregarBlockchain(&blockchain, nomeArquivo);
                 break;
 
-            case 6: // Verificar transação
+            case 6: // Verificar transação em um bloco
                 printf("Digite a transação a verificar: ");
                 fgets(transacaoParaVerificar, sizeof(transacaoParaVerificar), stdin);
                 transacaoParaVerificar[strcspn(transacaoParaVerificar, "\n")] = '\0'; // Remover o newline
-                printf("Digite o índice do bloco: ");
+                printf("Digite o índice do bloco para verificar: ");
                 scanf("%d", &indiceBloco);
-                getchar(); // Consumir o caractere de nova linha
+                getchar(); // Consumir o newline deixado pelo scanf
 
                 if (indiceBloco >= 0 && indiceBloco < blockchain.qtdBlocos) {
-                    Bloco* bloco = &blockchain.blocos[indiceBloco];
-                    int encontrada = 0;
-                    for (int i = 0; i < bloco->qtdTransacoes; i++) {
-                        if (strcmp(bloco->transacoes[i], transacaoParaVerificar) == 0) {
-                            printf("Transação encontrada no bloco %d.\n", indiceBloco);
-                            encontrada = 1;
-                            break;
-                        }
-                    }
-                    if (!encontrada) {
-                        printf("Transação não encontrada no bloco %d.\n", indiceBloco);
-                    }
+                    verificarTransacao(&blockchain, indiceBloco, transacaoParaVerificar);
                 } else {
-                    printf("Índice de bloco inválido.\n");
+                    printf("Índice do bloco inválido.\n");
                 }
+                break;
+
+            case 7: // Simular ataque
+                printf("Digite a nova transação para substituir no bloco gênesis: ");
+                fgets(novaTransacao, sizeof(novaTransacao), stdin);
+                novaTransacao[strcspn(novaTransacao, "\n")] = '\0'; // Remover o newline
+                simularAtaque(&blockchain, novaTransacao);
                 break;
 
             case 0: // Sair
                 printf("Encerrando o programa.\n");
-                exit(0);
+                return 0;
 
-            default: // Opção inválida
+            default:
                 printf("Opção inválida! Tente novamente.\n");
                 break;
         }
