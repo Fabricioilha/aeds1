@@ -4,8 +4,8 @@
 #include <string.h>
 #include <time.h>
 
-void inicializarBloco(Bloco* bloco, const char* hashAnterior) {
-    bloco->indice = 0;
+void inicializarBloco(Bloco* bloco, const char* hashAnterior, int ind) {
+    bloco->indice = ind;
     time_t agora = time(NULL);
     strftime(bloco->timestamp, sizeof(bloco->timestamp), "%Y-%m-%d %H:%M:%S", localtime(&agora));
     strcpy(bloco->hashAnterior, hashAnterior);
