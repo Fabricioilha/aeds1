@@ -16,7 +16,7 @@ typedef struct {
     int qtdTransacoes;
 } Bloco;
 
-void inicializarBloco(Bloco* bloco, const char* hashAnterior);
+void inicializarBloco(Bloco* bloco, const char* hashAnterior, int ind);
 void adicionarTransacao(Bloco* bloco, const char* transacao);
 void calcularRaizMerkle(Bloco* bloco);
 void provaDeTrabalho(Bloco* bloco);
