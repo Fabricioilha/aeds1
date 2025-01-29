@@ -9,7 +9,7 @@ int main() {
 
     // Criar o bloco gênesis
     Bloco blocoGenesis;
-    inicializarBloco(&blocoGenesis, "0");
+    inicializarBloco(&blocoGenesis, "0", 0);
     provaDeTrabalho(&blocoGenesis);
     adicionarBloco(&blockchain, blocoGenesis);
 
@@ -44,7 +44,8 @@ int main() {
 
             case 2: { // Minerar novo bloco
                 Bloco novoBloco;
-                inicializarBloco(&novoBloco, blockchain.blocos[blockchain.qtdBlocos - 1].hash);
+                int proxBloc = blockchain.qtdBlocos -1;
+                inicializarBloco(&novoBloco, blockchain.blocos[blockchain.qtdBlocos - 1].hash, blockchain.qtdBlocos);
                 provaDeTrabalho(&novoBloco);
                 adicionarBloco(&blockchain, novoBloco);
                 break;
