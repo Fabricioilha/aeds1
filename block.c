@@ -29,13 +29,38 @@ void calcularRaizMerkle(Bloco* bloco) {
         return;
     }
 
-    char hashesConcatenados[MAX_TRANSACOES * EVP_MAX_MD_SIZE * 2] = {0};
-    for (int i = 0; i < bloco->qtdTransacoes; i++) {
-        char hash[EVP_MAX_MD_SIZE * 2 + 1];
-        calcularHashSHA256(bloco->transacoes[i], hash);
-        strcat(hashesConcatenados, hash);
+    // Vetor dinâmico para armazenar os hashes iniciais das transações
+    char hashes[MAX_TRANSACOES][EVP_MAX_MD_SIZE * 2 + 1];
+    int numHashes = bloco->qtdTransacoes;
+
+    // Gerar o hash de cada transação
+    for (int i = 0; i < numHashes; i++) {
+        calcularHashSHA256(bloco->transacoes[i], hashes[i]);
     }
-    calcularHashSHA256(hashesConcatenados, bloco->raizMerkle);
+
+    // Reduzindo até restar um único hash
+    while (numHashes > 1) {
+        int novaQtd = 0;
+        for (int i = 0; i < numHashes; i += 2) {
+            char combinado[EVP_MAX_MD_SIZE * 4 + 1] = {0};
+
+            // Se houver um par, concatena os dois hashes
+            if (i + 1 < numHashes) {
+                snprintf(combinado, sizeof(combinado), "%s%s", hashes[i], hashes[i + 1]);
+            } else {
+                // Se for ímpar, repete o último hash
+                snprintf(combinado, sizeof(combinado), "%s%s", hashes[i], hashes[i]);
+            }
+
+            // Calcula novo hash e armazena no próximo nível
+            calcularHashSHA256(combinado, hashes[novaQtd]);
+            novaQtd++;
+        }
+        numHashes = novaQtd; // Atualiza a quantidade de hashes
+    }
+
+    // O último hash restante é a raiz de Merkle
+    strcpy(bloco->raizMerkle, hashes[0]);
 }
 
 void provaDeTrabalho(Bloco* bloco) {

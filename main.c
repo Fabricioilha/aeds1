@@ -44,7 +44,7 @@ int main() {
 
             case 2: { // Minerar novo bloco
                 Bloco novoBloco;
-                int proxBloc = blockchain.qtdBlocos -1;
+                //int proxBloc = blockchain.qtdBlocos -1;
                 inicializarBloco(&novoBloco, blockchain.blocos[blockchain.qtdBlocos - 1].hash, blockchain.qtdBlocos);
                 provaDeTrabalho(&novoBloco);
                 adicionarBloco(&blockchain, novoBloco);

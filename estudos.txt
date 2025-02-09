@@ -1,0 +1,44 @@
+Função para calcular a arvore merkle tree
+
+Passo 1 - Hash de cada transação
+Hash(A) -> "aaa111"
+Hash(B) -> "bbb222"
+Hash(C) -> "ccc333"
+
+Passo 2 - Agrupar de dois em dois e calcular novo hash
+SHA256("aaa111bbb222") -> "h1h2"
+SHA256("ccc333ccc333") -> "h3h3"  (Repete porque é ímpar)
+
+Passo 3 - Última combinação para gerar a raiz Merkle
+SHA256("h1h2h3h3") -> Raiz Merkle
+
+EVP_MAX_MD_SIZE é da biblioteca openssl que indica o tamanho máximo da hash.
+--------------------------------------------------------------------------------
+
+Proof of Work (PoW) é um sistema em que os mineradores precisam encontrar um número (nonce) que, 
+quando combinado com os dados do bloco, 
+gera um hash que atende a um critério específico. 
+Esse critério geralmente envolve que o hash comece com 4 zeros.
+
+Para cada iteração:
+O nonce é incrementado (ou seja, muda a entrada do hash).
+Os dados do bloco são concatenados em uma string.
+A função calcularHashSHA256 é chamada para gerar um novo hash.
+O código verifica se os primeiros 4 caracteres do hash são "0000".
+Quando encontra um hash válido:
+
+O loop para quando um hash válido é encontrado.
+O bloco agora tem um nonce e um hash que o tornam válido na blockchain.
+--------------------------------------------------------------------------------
+
+Resumo da Função verificarTransacao
+A função verificarTransacao verifica se uma transação específica existe dentro de um bloco da blockchain, 
+utilizando a árvore de Merkle.
+
+Passos da função:
+Gerar o hash da transação desejada para compará-lo com os hashes das transações do bloco.
+Criar uma lista de hashes das transações do bloco e encontrar a posição da transação procurada.
+Subir pela árvore de Merkle, combinando os hashes até chegar à raiz.
+Comparar a raiz calculada com a raiz de Merkle do bloco para verificar se a transação é válida.
+Se a transação for encontrada e validada, a função imprime que foi verificada com sucesso. Caso contrário, 
+imprime uma mensagem de erro.

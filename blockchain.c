@@ -4,20 +4,61 @@
 #include <string.h>
 #include <time.h>
 
-void verificarTransacao(const Blockchain* blockchain, int indiceBloco, const char* transacao) {
-    if (indiceBloco < 0 || indiceBloco >= blockchain->qtdBlocos) {
-        printf("Índice de bloco inválido. Não foi possível verificar a transação.\n");
+void verificarTransacaoMerkle(const Bloco* bloco, const char* transacao) {
+    char hashTransacao[EVP_MAX_MD_SIZE * 2 + 1];
+    calcularHashSHA256(transacao, hashTransacao);
+
+    char hashes[MAX_TRANSACOES][EVP_MAX_MD_SIZE * 2 + 1];
+    int numHashes = bloco->qtdTransacoes;
+    int encontrada = -1;
+
+    // Gerar os hashes das transações e encontrar o índice da transação desejada
+    for (int i = 0; i < numHashes; i++) {
+        calcularHashSHA256(bloco->transacoes[i], hashes[i]);
+        if (strcmp(hashes[i], hashTransacao) == 0) {
+            encontrada = i;
+        }
+    }
+
+    if (encontrada == -1) {
+        printf("Transação não encontrada na árvore de Merkle.");
         return;
     }
 
-    const Bloco* bloco = &blockchain->blocos[indiceBloco];
-    for (int i = 0; i < bloco->qtdTransacoes; i++) {
-        if (strcmp(bloco->transacoes[i], transacao) == 0) {
-            printf("Transação encontrada no bloco %d.\n", indiceBloco);
-            return;
+    // Propagar o hash até a raiz da árvore de Merkle
+    while (numHashes > 1) {
+        int novaQtd = 0;
+        for (int i = 0; i < numHashes; i += 2) {
+            char combinado[EVP_MAX_MD_SIZE * 4 + 1] = {0};
+            if (i + 1 < numHashes) {
+                snprintf(combinado, sizeof(combinado), "%s%s", hashes[i], hashes[i + 1]);
+            } else {
+                snprintf(combinado, sizeof(combinado), "%s%s", hashes[i], hashes[i]);
+            }
+            calcularHashSHA256(combinado, hashes[novaQtd]);
+
+            if (i == encontrada || i + 1 == encontrada) {
+                encontrada = novaQtd;
+            }
+            novaQtd++;
         }
+        numHashes = novaQtd;
     }
-    printf("Transação não encontrada no bloco %d.\n", indiceBloco);
+
+    if (strcmp(hashes[0], bloco->raizMerkle) == 0) {
+        printf("Transação encontrada e verificada na árvore de Merkle.\n");
+    } else {
+        printf("Falha na verificação da transação na árvore de Merkle.\n");
+    }
+}
+
+void verificarTransacao(const Blockchain* blockchain, int indiceBloco, const char* transacao) {
+    if (indiceBloco < 0 || indiceBloco >= blockchain->qtdBlocos) {
+        printf("Índice de bloco inválido.\n");
+        return;
+    }
+
+    verificarTransacaoMerkle(&blockchain->blocos[indiceBloco], transacao);
 }
 
 void simularAtaque(Blockchain* blockchain, const char* novaTransacao) {
