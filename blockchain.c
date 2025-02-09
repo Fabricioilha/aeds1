@@ -1,8 +1,47 @@
+#define _GNU_SOURCE
 #include "blockchain.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+
+int dificuldade = 4;  // Começamos com 4 zeros no hash
+
+#define TEMPO_ALVO 10  // Tempo alvo para minerar um bloco (segundos)
+#define AJUSTE_INTERVALO 5  // Ajustar a dificuldade a cada 5 blocos
+#define DIFICULDADE_MIN 2  // Dificuldade mínima permitida
+#define DIFICULDADE_MAX 6  // Dificuldade máxima permitida
+
+void ajustarDificuldade(Blockchain* blockchain) {
+    if (blockchain->qtdBlocos < AJUSTE_INTERVALO) {
+        return;  // Só ajusta após um certo número de blocos
+    }
+
+    Bloco* blocoAtual = &blockchain->blocos[blockchain->qtdBlocos - 1];
+    Bloco* blocoAnterior = &blockchain->blocos[blockchain->qtdBlocos - AJUSTE_INTERVALO];
+
+    struct tm tmInicio, tmFim;
+    strptime(blocoAnterior->timestamp, "%Y-%m-%d %H:%M:%S", &tmInicio);
+    strptime(blocoAtual->timestamp, "%Y-%m-%d %H:%M:%S", &tmFim);
+
+    time_t tempoInicio = mktime(&tmInicio);
+    time_t tempoFim = mktime(&tmFim);
+
+    double tempoMedio = (double)(tempoFim - tempoInicio) / AJUSTE_INTERVALO;
+    
+    if (tempoMedio < TEMPO_ALVO) {
+        if (dificuldade < DIFICULDADE_MAX) {
+            dificuldade++;
+            printf("Dificuldade aumentada para %d\n", dificuldade);
+        }
+    } else if (tempoMedio > TEMPO_ALVO) {
+        if (dificuldade > DIFICULDADE_MIN) {
+            dificuldade--;
+            printf("Dificuldade reduzida para %d\n", dificuldade);
+        }
+    }
+}
 
 void verificarTransacaoMerkle(const Bloco* bloco, const char* transacao) {
     char hashTransacao[EVP_MAX_MD_SIZE * 2 + 1];
@@ -67,34 +106,64 @@ void simularAtaque(Blockchain* blockchain, const char* novaTransacao) {
         return;
     }
 
-    // Alterar a primeira transação do bloco gênesis
     Bloco* bloco = &blockchain->blocos[0];
+
     if (bloco->qtdTransacoes == 0) {
         printf("Bloco gênesis não possui transações.\n");
         return;
     }
 
-    printf("Alterando a primeira transação do bloco gênesis...\n");
-    strcpy(bloco->transacoes[0], novaTransacao);
+    printf("\n======= INICIANDO SIMULAÇÃO DE ATAQUE =======\n");
+
+    // Alterar a primeira transação do bloco gênesis
+    printf("1. Alterando a primeira transação do bloco gênesis...\n");
+    strncpy(bloco->transacoes[0], novaTransacao, sizeof(bloco->transacoes[0]) - 1);
+    bloco->transacoes[0][sizeof(bloco->transacoes[0]) - 1] = '\0';
+
+    printf("   Nova transação: %s\n", bloco->transacoes[0]);
+
+    // Recalcular a raiz de Merkle do bloco gênesis
+    printf("2. Recalculando a raiz de Merkle do bloco gênesis...\n");
     calcularRaizMerkle(bloco);
+    printf("   Nova raiz Merkle: %s\n", bloco->raizMerkle);
 
     // Recalcular prova de trabalho do bloco gênesis
-    printf("Recalculando prova de trabalho do bloco gênesis...\n");
+    printf("3. Recalculando a prova de trabalho do bloco gênesis...\n");
     clock_t inicio = clock();
     provaDeTrabalho(bloco);
-
-    // Propagar alterações para os blocos subsequentes
-    for (int i = 1; i < blockchain->qtdBlocos; i++) {
-        Bloco* blocoAtual = &blockchain->blocos[i];
-        strcpy(blocoAtual->hashAnterior, blockchain->blocos[i - 1].hash);
-        calcularRaizMerkle(blocoAtual);
-        provaDeTrabalho(blocoAtual);
-    }
     clock_t fim = clock();
+    printf("   Novo hash do bloco gênesis: %s\n", bloco->hash);
 
     double tempoGasto = (double)(fim - inicio) / CLOCKS_PER_SEC;
-    printf("Ataque simulado concluído. Tempo total para recalcular os hashes: %.2f segundos.\n", tempoGasto);
+    printf("   Tempo para recalcular prova de trabalho: %.2f segundos\n", tempoGasto);
+
+    // Propagar a alteração para os blocos subsequentes
+    for (int i = 1; i < blockchain->qtdBlocos; i++) {
+        printf("\n4. Atualizando bloco %d...\n", i);
+        Bloco* blocoAtual = &blockchain->blocos[i];
+
+        printf("   Atualizando hash anterior...\n");
+        strncpy(blocoAtual->hashAnterior, blockchain->blocos[i - 1].hash, sizeof(blocoAtual->hashAnterior) - 1);
+        blocoAtual->hashAnterior[sizeof(blocoAtual->hashAnterior) - 1] = '\0';
+        printf("   Novo hash anterior: %s\n", blocoAtual->hashAnterior);
+
+        printf("   Recalculando a raiz de Merkle...\n");
+        calcularRaizMerkle(blocoAtual);
+        printf("   Nova raiz Merkle: %s\n", blocoAtual->raizMerkle);
+
+        printf("   Recalculando a prova de trabalho...\n");
+        clock_t inicioBloco = clock();
+        provaDeTrabalho(blocoAtual);
+        clock_t fimBloco = clock();
+        printf("   Novo hash do bloco %d: %s\n", i, blocoAtual->hash);
+
+        double tempoBloco = (double)(fimBloco - inicioBloco) / CLOCKS_PER_SEC;
+        printf("   Tempo para recalcular prova de trabalho: %.2f segundos\n", tempoBloco);
+    }
+
+    printf("\n======= SIMULAÇÃO DE ATAQUE CONCLUÍDA =======\n");
 }
+
 
 void inicializarBlockchain(Blockchain* blockchain) {
     blockchain->qtdBlocos = 0;

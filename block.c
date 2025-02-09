@@ -4,6 +4,9 @@
 #include <string.h>
 #include <time.h>
 
+
+
+
 void inicializarBloco(Bloco* bloco, const char* hashAnterior, int ind) {
     bloco->indice = ind;
     time_t agora = time(NULL);
