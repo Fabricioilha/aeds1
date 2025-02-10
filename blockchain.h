@@ -4,6 +4,10 @@
 #include "block.h"
 
 #define MAX_BLOCOS 100
+#define TEMPO_ALVO 10  // Tempo alvo para minerar um bloco (segundos)
+#define AJUSTE_INTERVALO 1  // Ajustar a dificuldade a cada 5 blocos
+#define DIFICULDADE_MIN 2  // Dificuldade mínima permitida
+#define DIFICULDADE_MAX 6  // Dificuldade máxima permitida
 
 typedef struct {
     Bloco blocos[MAX_BLOCOS];
@@ -11,6 +15,7 @@ typedef struct {
 } Blockchain;
 
 extern int dificuldade;
+
 void inicializarBlockchain(Blockchain* blockchain);
 void adicionarBloco(Blockchain* blockchain, Bloco bloco);
 void salvarBlockchain(const Blockchain* blockchain, const char* arquivo);

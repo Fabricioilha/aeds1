@@ -5,17 +5,11 @@
 #include <string.h>
 #include <time.h>
 
-
-int dificuldade = 4;  // Começamos com 4 zeros no hash
-
-#define TEMPO_ALVO 10  // Tempo alvo para minerar um bloco (segundos)
-#define AJUSTE_INTERVALO 5  // Ajustar a dificuldade a cada 5 blocos
-#define DIFICULDADE_MIN 2  // Dificuldade mínima permitida
-#define DIFICULDADE_MAX 6  // Dificuldade máxima permitida
+int dificuldade = DIFICULDADE_MIN;  
 
 void ajustarDificuldade(Blockchain* blockchain) {
-    if (blockchain->qtdBlocos < AJUSTE_INTERVALO) {
-        return;  // Só ajusta após um certo número de blocos
+    if (blockchain->qtdBlocos <= AJUSTE_INTERVALO) {
+        return;  // Só ajusta após atingir o intervalo mínimo de blocos
     }
 
     Bloco* blocoAtual = &blockchain->blocos[blockchain->qtdBlocos - 1];
@@ -29,19 +23,23 @@ void ajustarDificuldade(Blockchain* blockchain) {
     time_t tempoFim = mktime(&tmFim);
 
     double tempoMedio = (double)(tempoFim - tempoInicio) / AJUSTE_INTERVALO;
-    
-    if (tempoMedio < TEMPO_ALVO) {
-        if (dificuldade < DIFICULDADE_MAX) {
-            dificuldade++;
-            printf("Dificuldade aumentada para %d\n", dificuldade);
-        }
-    } else if (tempoMedio > TEMPO_ALVO) {
-        if (dificuldade > DIFICULDADE_MIN) {
-            dificuldade--;
-            printf("Dificuldade reduzida para %d\n", dificuldade);
-        }
+
+    // Ajuste proporcional de dificuldade
+    int ajuste = (int)((TEMPO_ALVO - tempoMedio) / TEMPO_ALVO);
+    int novaDificuldade = dificuldade + ajuste;
+
+    // Mantém dentro dos limites
+    if (novaDificuldade < DIFICULDADE_MIN) novaDificuldade = DIFICULDADE_MIN;
+    if (novaDificuldade > DIFICULDADE_MAX) novaDificuldade = DIFICULDADE_MAX;
+
+    printf("Tentando ajustar dificuldade: atual=%d, nova=%d\n", dificuldade, novaDificuldade);
+
+    if (novaDificuldade != dificuldade) {
+        printf("Dificuldade ajustada de %d para %d\n", dificuldade, novaDificuldade);
+        dificuldade = novaDificuldade;
     }
 }
+
 
 void verificarTransacaoMerkle(const Bloco* bloco, const char* transacao) {
     char hashTransacao[EVP_MAX_MD_SIZE * 2 + 1];

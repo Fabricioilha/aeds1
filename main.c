@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void inserirTransacoesEMinerar(Blockchain* bc);
-
 int main() {
 	Blockchain blockchain;
 	inicializarBlockchain(&blockchain);
@@ -32,7 +30,6 @@ int main() {
 		printf("5. Carregar blockchain de arquivo\n");
 		printf("6. Verificar transacao em um bloco\n");
 		printf("7. Simular ataque na blockchain\n");
-		printf("8. Inserir blocos automaticamente (testes)\n");
 		printf("0. Sair\n");
 		printf("Escolha uma opcao: ");
 		scanf("%d", &opcao);
@@ -73,7 +70,7 @@ int main() {
 			carregarBlockchain(&blockchain, nomeArquivo);
 			break;
 
-		case 6: // Verificar transaC'C#o em um bloco
+		case 6: // Verificar transacao em um bloco
 			printf("Digite a transacao a verificar: ");
 			fgets(transacaoParaVerificar, sizeof(transacaoParaVerificar), stdin);
 			transacaoParaVerificar[strcspn(transacaoParaVerificar, "\n")] = '\0'; // Remover o newline
@@ -94,68 +91,19 @@ int main() {
 			novaTransacao[strcspn(novaTransacao, "\n")] = '\0'; // Remover o newline
 			simularAtaque(&blockchain, novaTransacao);
 			break;
-		case 8:
-			printf("Deseja iniciar a inserC'C#o de transaC'C5es automC!ticas para testes?\n");
-			printf("1 - Sim | 0 - NC#o\n");
-
-			int aux;
-			scanf("%d", &aux);
-			getchar(); // Consome o newline do scanf
-
-			if (aux != 1 && aux != 0) { // Corrigido o erro lC3gico
-				printf("Entrada invC!lida! Digite 0 ou 1\n");
-				break;
-			}
-
-			if (aux == 1) {
-				inserirTransacoesEMinerar(&blockchain);
-			}
-
-			// Continua para o menu principal apC3s a execuC'C#o
-			break;
 
 		case 0: // Sair
 			printf("Encerrando o programa.\n");
 			return 0;
 
 		default:
-			printf("OpC'C#o invC!lida! Tente novamente.\n");
+			printf("Opcao invalida! Tente novamente.\n");
 			break;
 		}
 	}
 
 	return 0;
 }
-
-
-
-void inserirTransacoesEMinerar(Blockchain* blockchain) {
-    char transacao[256];
-    int blocosMinerados = 0;
-
-    while (blocosMinerados < 20) {
-        sprintf(transacao, "Transação automática #%d", blockchain->qtdBlocos);
-        adicionarTransacao(&blockchain->blocos[blockchain->qtdBlocos - 1], transacao);
-        printf("Transação '%s' adicionada ao bloco #%d\n", transacao, blockchain->qtdBlocos - 1);
-
-        // Minera um novo bloco a cada 3 transações
-        if (blockchain->blocos[blockchain->qtdBlocos - 1].qtdTransacoes % 3 == 0) {
-            Bloco novoBloco;
-            inicializarBloco(&novoBloco, blockchain->blocos[blockchain->qtdBlocos - 1].hash, blockchain->qtdBlocos);
-            provaDeTrabalho(&novoBloco);
-            adicionarBloco(blockchain, novoBloco);
-            ajustarDificuldade(blockchain);
-
-            blocosMinerados++;
-            printf("Novo bloco #%d minerado com sucesso!\n", blockchain->qtdBlocos - 1);
-        }
-    }
-
-    printf("\n✅ 20 blocos minerados automaticamente!\n");
-    printf("Pressione ENTER para voltar ao menu principal...\n");
-    getchar(); // Aguarda ENTER antes de voltar ao menu
-}
-
 
 
 

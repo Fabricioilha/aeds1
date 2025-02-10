@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-
-
+#include "blockchain.h"
 
 void inicializarBloco(Bloco* bloco, const char* hashAnterior, int ind) {
     bloco->indice = ind;
@@ -72,7 +70,7 @@ void provaDeTrabalho(Bloco* bloco) {
         bloco->nonce++;
         sprintf(dadosBloco, "%d%s%s%s%d", bloco->indice, bloco->timestamp, bloco->hashAnterior, bloco->raizMerkle, bloco->nonce);
         calcularHashSHA256(dadosBloco, bloco->hash);
-    } while (strncmp(bloco->hash, "0000", 4) != 0);
+    } while (strncmp(bloco->hash, "00000000", dificuldade) != 0);
 }
 
 void calcularHashSHA256(const char* entrada, char hash[EVP_MAX_MD_SIZE * 2 + 1]) {
