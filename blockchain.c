@@ -58,7 +58,7 @@ void verificarTransacaoMerkle(const Bloco* bloco, const char* transacao) {
     }
 
     if (encontrada == -1) {
-        printf("Transação não encontrada na árvore de Merkle.");
+        printf("Transação não encontrada na árvore de Merkle.\n");
         return;
     }
 
